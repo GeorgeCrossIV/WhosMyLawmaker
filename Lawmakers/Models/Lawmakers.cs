@@ -26,6 +26,7 @@ namespace Lawmakers.Models
         public Leadership_Roles[] leadership_roles { get; set; }
         public Other_Names[] other_names { get; set; }
         public Family[] family { get; set; }
+        public string state { get; set; }
     }
 
     public class Id

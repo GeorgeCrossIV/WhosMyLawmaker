@@ -96,6 +96,7 @@ namespace Lawmakers.Services
                 foreach (Lawmaker lawmaker in lawmakers)
                 {
                     id++; // incrementer used as the document id
+                    lawmaker.state = lawmaker.terms.First().state;
                     AddLawmaker(config, token, lawmaker, id);
                 }
 
@@ -105,6 +106,33 @@ namespace Lawmakers.Services
             }
 
             return lawmakers;
+        }
+
+        public static List<LawmakerDocument> GetLawmakers(IConfiguration config, string token, string state)
+        {
+            List<LawmakerDocument> lawmakerDocuments = new List<LawmakerDocument>();
+
+            var baseUrl = config.GetSection("Astra").GetSection("BaseUrl").Value;
+            var keyspace = config.GetSection("Astra").GetSection("Keyspace").Value;
+            var collection = config.GetSection("Astra").GetSection("Collection").Value;
+            var url = string.Format("{0}namespaces/{1}/collections/{2}?where={{\"state\": {{\"$eq\": \"{3}\"}}}}&raw=true", 
+                baseUrl, keyspace, collection, state);
+
+            var client = new RestClient(url);
+            client.Timeout = -1;
+            var request = new RestRequest(Method.GET);
+            request.AddHeader("X-Cassandra-Token", token);
+            IRestResponse response = client.Execute(request);
+            Console.WriteLine("retrieved lawmakers for: " + state);
+
+            // get search results
+            JObject jObject = JObject.Parse(response.Content);
+            foreach (var x in jObject.Children()) {
+                lawmakerDocuments.Add(Services.Astra.GetLawmaker(config, token, Convert.ToInt32(x.Path)));
+            }
+
+            
+            return lawmakerDocuments;
         }
     }
 }

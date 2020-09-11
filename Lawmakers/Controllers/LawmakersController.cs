@@ -22,19 +22,21 @@ namespace Lawmakers.Controllers
             _host = host;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string state)
         {
+            string defaultState = "PA";
+
+            //if (state.Length == 0 || state == null)
+            //    state = defaultState;
+
             List<LawmakerDocument> lawmakerDocuments = new List<LawmakerDocument>();
 
             // get a list of Lawmakers. Currently don't have a method for 
             // retrieving a list of lawmakers via a query, so I'll just pull the first 537
             try
             {
-                for (int id = 1; id < 10; id++)
-                {
-                    lawmakerDocuments.Add(Services.Astra.GetLawmaker(_config, GetToken(), id));
-                }
-                return View(lawmakerDocuments);
+                //Services.Astra.GetLawmakers(_config, GetToken(), defaultState);
+                return View(Services.Astra.GetLawmakers(_config, GetToken(), defaultState));
 
             }
             catch (Exception ex)
