@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Lawmakers.Models.LawmakerDocument>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.first)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.last)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.official_full)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.middle)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.nickname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.data.name.suffix)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.first)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.last)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.official_full)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.middle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.nickname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.data.name.suffix)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {  id=item.documentId }) |
+                @Html.ActionLink("Details", "Details", new { id = item.documentId }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.documentId })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,58 @@
+﻿@model Lawmakers.Models.LawmakerDocument
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Name</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.first)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.first)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.last)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.last)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.official_full)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.official_full)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.middle)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.middle)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.nickname)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.nickname)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.data.name.suffix)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.data.name.suffix)
+        </dd>
+    </dl>
+</div>
+
+<partial name="~/Views/Lawmakers/TermsView.cshtml" model=Model.data.terms />
+<partial name="~/Views/Lawmakers/BioView.cshtml" model=Model.data.bio />
+
+<div>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.documentId }) |
+    <a asp-action="Index">Back to List</a>
+</div>
