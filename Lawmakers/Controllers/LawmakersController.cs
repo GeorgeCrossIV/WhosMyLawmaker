@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Lawmakers.Models;
 using Lawmakers.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Configuration;
 
 namespace Lawmakers.Controllers
@@ -26,8 +28,8 @@ namespace Lawmakers.Controllers
         {
             string defaultState = "PA";
 
-            //if (state.Length == 0 || state == null)
-            //    state = defaultState;
+            if ( state == null || state.Length == 0)
+                state = defaultState;
 
             List<LawmakerDocument> lawmakerDocuments = new List<LawmakerDocument>();
 
@@ -35,14 +37,19 @@ namespace Lawmakers.Controllers
             // retrieving a list of lawmakers via a query, so I'll just pull the first 537
             try
             {
-                //Services.Astra.GetLawmakers(_config, GetToken(), defaultState);
-                return View(Services.Astra.GetLawmakers(_config, GetToken(), defaultState));
-
+                ViewBag.State = state;
+                return View(Services.Astra.GetLawmakers(_config, GetToken(), state.ToUpper()));
             }
             catch (Exception ex)
             {
                 return View();
             }        
+        }
+
+        [HttpPost]
+        public IActionResult Index(FormModel model)
+        {
+            return RedirectToAction("Index",new { state = model.State });
         }
 
         public IActionResult Details(int id)
@@ -54,9 +61,10 @@ namespace Lawmakers.Controllers
 
         public IActionResult LoadLawmakers()
         {
+            // loads lawmaker data from a third party site into Astra
             Astra.LoadLawmakers(_host, _config);
 
-            return View();
+            return RedirectToAction("Index");
         }
 
         private string GetToken()
@@ -73,5 +81,10 @@ namespace Lawmakers.Controllers
             return _Token;
         }
 
+    }
+    public class FormModel
+    {
+        [DisplayName("State")]
+        public string State { get; set; }
     }
 }

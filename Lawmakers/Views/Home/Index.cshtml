@@ -6,3 +6,13 @@
     <h1 class="display-4">Welcome</h1>
     <p>Connected: @ViewBag.Authenticated</p>
 </div>
+<p><b>Who's my lawmaker</b> is a simple application that will allow you to type in your state and retrieve a
+ a list of the legislators for the state.</p>
+<p>The Connected status is True if the application succesfully connects to an Astra database; otherwise, 
+    check the configuration file and verify that the database is available.</p>
+<h3>Data</h3>
+<p>The data used by the application can be obtained here: <a href="https://theunitedstates.io/congress-legislators/legislators-current.json" target="_blank">https://theunitedstates.io/congress-legislators/legislators-current.json</a> </p>
+<h3>Functionality</h3>
+<p>The <a href="\Lawmakers\LoadLawmakers">Load Lawmakers</a>  menu option will obtain the lawmakers from the JSON file listed above and store 
+    the JSON data in an Astra database using the Document API. It will take approximately 2 to 3 minutes to load the data from the external source to the database.</p>
+<p>The <a href="\Lawmakers">View Lawmakers</a> menu option provides the ability to find lawmakers by state.</p>

@@ -5,14 +5,14 @@
     
 }
 
-<h1>Lawmakers by State</h1>
+<h1>Lawmakers by State - @ViewBag.State</h1>
 
-
-
-@*<form asp-controller="Lawmakers" asp-action="Index" method="get">
-    <input asp-for="State" 
-
-</form>*@
+<form asp-controller="Lawmakers" asp-action="Index" method="post">
+    <label for="State">State: </label>
+    <input placeholder="State" for="State" id="State" name="State" class="form-control"/>
+    <input type="submit" />
+</form>
+<hr />
 <table class="table">
     <thead>
         <tr>
@@ -38,7 +38,8 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        @if (Model != null) {
+        @foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.data.name.first)
@@ -59,11 +60,11 @@
                 @Html.DisplayFor(modelItem => item.data.name.suffix)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new {  id=item.documentId }) |
-                @Html.ActionLink("Details", "Details", new { id = item.documentId }) |
-                @Html.ActionLink("Delete", "Delete", new { id = item.documentId })
+                @Html.ActionLink("Details", "Details", new { id = item.documentId })
             </td>
         </tr>
+}
+
 }
     </tbody>
 </table>
