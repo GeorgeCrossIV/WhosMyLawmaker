@@ -11,6 +11,11 @@ namespace Lawmakers.Models
         public Lawmaker[] Lawmakers { get; set; }
     }
 
+    public class LawmakersDocument
+    {
+        public List<Lawmaker> Lawmakers { get; set; }
+    }
+
     public class LawmakerDocument
     {
         public string documentId { get; set; }

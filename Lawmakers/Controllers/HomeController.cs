@@ -27,12 +27,12 @@ namespace Lawmakers.Controllers
             var authUrl = _config.GetSection("Astra").GetSection("AuthUrl").Value;
             var username = _config.GetSection("Astra").GetSection("Username").Value;
             var password = _config.GetSection("Astra").GetSection("Password").Value;
-            var token = Astra.GetToken(authUrl, username, password);
+            //var token = Astra.GetToken(authUrl, username, password);
 
-            if (token.Length > 0)
-                ViewBag.Authenticated = true;
-            else
-                ViewBag.Authenticated = false;
+            //if (token.Length > 0)
+            //    ViewBag.Authenticated = true;
+            //else
+            //    ViewBag.Authenticated = false;
 
             return View();
         }

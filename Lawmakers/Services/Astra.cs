@@ -29,13 +29,17 @@ namespace Lawmakers.Services
             return JObject.Parse(response.Content)["authToken"].ToString();
         }
 
-        public static void AddLawmaker(IConfiguration config, string token, Lawmaker lawmaker, int id)
+        public static void AddLawmaker(IConfiguration config, Lawmaker lawmaker, int id)
         {
             var baseUrl = config.GetSection("Astra").GetSection("BaseUrl").Value;
-            var keyspace = config.GetSection("Astra").GetSection("Keyspace").Value;
             var collection = config.GetSection("Astra").GetSection("Collection").Value;
             var lawmakerJson = JsonConvert.SerializeObject(lawmaker);
-            var url = string.Format("{0}namespaces/{1}/collections/{2}/{3}", baseUrl, keyspace, collection, id);
+            var db_id = config.GetSection("Astra").GetSection("ASTRA_DB_ID").Value;
+            var region = config.GetSection("Astra").GetSection("ASTRA_DB_REGION").Value;
+            var keyspace = config.GetSection("Astra").GetSection("ASTRA_DB_KEYSPACE").Value;
+            var token = config.GetSection("Astra").GetSection("ASTRA_DB_APPLICATION_TOKEN").Value;
+            var url = string.Format("https://{0}-{1}.apps.astra.datastax.com/api/rest/v2/namespaces/{2}/collections/lawmakers/{3}",
+                    db_id, region, keyspace, id);
 
             var client = new RestClient(url); 
             client.Timeout = -1;
@@ -45,16 +49,23 @@ namespace Lawmakers.Services
             request.AddParameter("application/json", lawmakerJson, ParameterType.RequestBody);
             IRestResponse response = client.Execute(request);
             Console.WriteLine(response.Content);
+
         }
 
-        public static LawmakerDocument GetLawmaker(IConfiguration config, string token, int id)
+        public static LawmakerDocument GetLawmaker(IConfiguration config, int id)
         {
             LawmakerDocument lawmakerDocument = new LawmakerDocument();
 
             var baseUrl = config.GetSection("Astra").GetSection("BaseUrl").Value;
-            var keyspace = config.GetSection("Astra").GetSection("Keyspace").Value;
             var collection = config.GetSection("Astra").GetSection("Collection").Value;
-            var url = string.Format("{0}namespaces/{1}/collections/{2}/{3}", baseUrl, keyspace, collection, id);
+
+            var db_id = config.GetSection("Astra").GetSection("ASTRA_DB_ID").Value;
+            var region = config.GetSection("Astra").GetSection("ASTRA_DB_REGION").Value;
+            var keyspace = config.GetSection("Astra").GetSection("ASTRA_DB_KEYSPACE").Value;
+            var token = config.GetSection("Astra").GetSection("ASTRA_DB_APPLICATION_TOKEN").Value;
+
+            var url = string.Format("https://{0}-{1}.apps.astra.datastax.com/api/rest/v2/namespaces/{2}/collections/lawmakers/{3}",
+                    db_id, region, keyspace, id);
 
             var client = new RestClient(url);
             client.Timeout = -1;
@@ -75,7 +86,6 @@ namespace Lawmakers.Services
                 var authUrl = config.GetSection("Astra").GetSection("AuthUrl").Value;
                 var username = config.GetSection("Astra").GetSection("Username").Value;
                 var password = config.GetSection("Astra").GetSection("Password").Value;
-                var token = Astra.GetToken(authUrl, username, password);
 
                 // load lawmaker data from the Internet
                 using (var client = new WebClient())
@@ -97,7 +107,7 @@ namespace Lawmakers.Services
                 {
                     id++; // incrementer used as the document id
                     lawmaker.state = lawmaker.terms.First().state;
-                    AddLawmaker(config, token, lawmaker, id);
+                    AddLawmaker(config, lawmaker, id);
                 }
 
             } catch (Exception ex)
@@ -108,15 +118,19 @@ namespace Lawmakers.Services
             return lawmakers;
         }
 
-        public static List<LawmakerDocument> GetLawmakers(IConfiguration config, string token, string state)
+        public static List<LawmakerDocument> GetLawmakers(IConfiguration config, string state)
         {
             List<LawmakerDocument> lawmakerDocuments = new List<LawmakerDocument>();
+            List<Lawmaker> lawmakers = new List<Lawmaker>();
 
+            var db_id = config.GetSection("Astra").GetSection("ASTRA_DB_ID").Value;
+            var region = config.GetSection("Astra").GetSection("ASTRA_DB_REGION").Value;
+            var keyspace = config.GetSection("Astra").GetSection("ASTRA_DB_KEYSPACE").Value;
+            var token = config.GetSection("Astra").GetSection("ASTRA_DB_APPLICATION_TOKEN").Value;
             var baseUrl = config.GetSection("Astra").GetSection("BaseUrl").Value;
-            var keyspace = config.GetSection("Astra").GetSection("Keyspace").Value;
             var collection = config.GetSection("Astra").GetSection("Collection").Value;
-            var url = string.Format("{0}namespaces/{1}/collections/{2}?where={{\"state\": {{\"$eq\": \"{3}\"}}}}&raw=true", 
-                baseUrl, keyspace, collection, state);
+            var url = string.Format("https://{0}-{1}.apps.astra.datastax.com/api/rest/v2/namespaces/{2}/collections/lawmakers?where={{\"state\": {{\"$eq\": \"{3}\"}}}}&page-size=20",
+                db_id, region, keyspace, state);
 
             var client = new RestClient(url);
             client.Timeout = -1;
@@ -125,13 +139,23 @@ namespace Lawmakers.Services
             IRestResponse response = client.Execute(request);
             Console.WriteLine("retrieved lawmakers for: " + state);
 
+            Lawmaker lawmaker;            
+
             // get search results
             JObject jObject = JObject.Parse(response.Content);
-            foreach (var x in jObject.Children()) {
-                lawmakerDocuments.Add(Services.Astra.GetLawmaker(config, token, Convert.ToInt32(x.Path)));
+            JToken result = JToken.Parse(response.Content);
+            JToken data = result.SelectToken("data");
+            foreach (var x in data.Children())
+            {
+                var lmString = x.ToString().Split(':', 2)[1];
+                lawmaker = JsonConvert.DeserializeObject<Lawmaker>(lmString);
+                //lawmakers.Add(lawmaker);
+                lawmakerDocuments.Add(new LawmakerDocument {
+                    documentId=x.Path.Split('.',2)[1],
+                    data = lawmaker
+                });
             }
 
-            
             return lawmakerDocuments;
         }
     }

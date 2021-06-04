@@ -38,7 +38,7 @@ namespace Lawmakers.Controllers
             try
             {
                 ViewBag.State = state;
-                return View(Services.Astra.GetLawmakers(_config, GetToken(), state.ToUpper()));
+                return View(Services.Astra.GetLawmakers(_config, state.ToUpper()));
             }
             catch (Exception ex)
             {
@@ -55,7 +55,7 @@ namespace Lawmakers.Controllers
         public IActionResult Details(int id)
         {
             // get the lawmaker document
-            var lawmakerDocument = Services.Astra.GetLawmaker(_config, GetToken(), id);
+            var lawmakerDocument = Services.Astra.GetLawmaker(_config, id);
             return View(lawmakerDocument);
         }
 
@@ -75,7 +75,7 @@ namespace Lawmakers.Controllers
                 var username = _config.GetSection("Astra").GetSection("Username").Value;
                 var password = _config.GetSection("Astra").GetSection("Password").Value;
 
-                _Token = Services.Astra.GetToken(authUrl, username, password);
+                //_Token = Services.Astra.GetToken(authUrl, username, password);
             }
 
             return _Token;
